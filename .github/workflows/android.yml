@@ -26,7 +26,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y glslang-tools
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+        run: |
+          set +o pipefail
+          yes | sdkmanager --licenses
       - name: Install Android build packages
         run: |
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
