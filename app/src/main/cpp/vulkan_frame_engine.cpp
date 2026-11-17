@@ -49,6 +49,8 @@ public:
   if(vkBeginCommandBuffer(commandBuffer_,&begin)!=VK_SUCCESS){error="vkBeginCommandBuffer failed";return false;}
   bufferBarrier(previous_.handle,VK_ACCESS_HOST_WRITE_BIT,VK_ACCESS_SHADER_READ_BIT,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   bufferBarrier(current_.handle,VK_ACCESS_HOST_WRITE_BIT,VK_ACCESS_SHADER_READ_BIT,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
+  // Order the host read of the previous output before this dispatch overwrites it.
+  bufferBarrier(output_.handle,VK_ACCESS_HOST_READ_BIT,VK_ACCESS_SHADER_WRITE_BIT,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT);
   vkCmdBindPipeline(commandBuffer_,VK_PIPELINE_BIND_POINT_COMPUTE,pipeline_);
   vkCmdBindDescriptorSets(commandBuffer_,VK_PIPELINE_BIND_POINT_COMPUTE,pipelineLayout_,0,1,&descriptorSet_,0,nullptr);
   const int32_t dimensions[2]={static_cast<int32_t>(width),static_cast<int32_t>(height)};
