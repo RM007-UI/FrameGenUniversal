@@ -17,18 +17,22 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: ''
+          accept-android-sdk-licenses: false
       - name: Install GLSL compiler
         run: |
           sudo apt-get update
           sudo apt-get install -y glslang-tools
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
-      - name: Install Android packages
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
+      - name: Install Android build packages
+        run: |
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
       - name: Verify source invariants
         run: python3 tools/verify_source.py
-      - name: Run tests and build APK
+      - name: Run tests and build debug APK
         run: gradle --no-daemon --stacktrace :app:testDebugUnitTest :app:assembleDebug
       - uses: actions/upload-artifact@v4
         with:
