@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(framegen_native LANGUAGES CXX)
+find_program(GLSLANG_VALIDATOR glslangValidator REQUIRED)
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+set(SPV_DIR "${CMAKE_CURRENT_BINARY_DIR}/spv")
+set(GEN_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
+file(MAKE_DIRECTORY "${SPV_DIR}" "${GEN_DIR}")
+set(SPV "${SPV_DIR}/motion_midpoint.spv")
+add_custom_command(OUTPUT "${SPV}"
+ COMMAND "${GLSLANG_VALIDATOR}" -V --target-env vulkan1.1 "${CMAKE_CURRENT_SOURCE_DIR}/shaders/motion_midpoint.comp" -o "${SPV}"
+ DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/shaders/motion_midpoint.comp" VERBATIM)
+set(HEADER "${GEN_DIR}/framegen_shader.hpp")
+add_custom_command(OUTPUT "${HEADER}"
+ COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/../../../../tools/embed_vulkan_shader.py" "${SPV}" "${HEADER}"
+ DEPENDS "${SPV}" "${CMAKE_CURRENT_SOURCE_DIR}/../../../../tools/embed_vulkan_shader.py" VERBATIM)
+add_custom_target(framegen_shader DEPENDS "${HEADER}")
+add_library(framegen_probe SHARED device_probe.cpp vulkan_frame_engine.cpp "${HEADER}")
+add_dependencies(framegen_probe framegen_shader)
+target_compile_features(framegen_probe PRIVATE cxx_std_20)
+target_compile_definitions(framegen_probe PRIVATE VK_USE_PLATFORM_ANDROID_KHR)
+target_compile_options(framegen_probe PRIVATE -Wall -Wextra -Werror=return-type)
+target_include_directories(framegen_probe PRIVATE "${GEN_DIR}")
+find_library(log-lib log REQUIRED)
+find_library(vulkan-lib vulkan REQUIRED)
+target_link_libraries(framegen_probe PRIVATE ${log-lib} ${vulkan-lib})
