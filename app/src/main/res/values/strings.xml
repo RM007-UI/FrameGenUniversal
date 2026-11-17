@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FrameGen Universal</string>
+    <string name="framegen_accessibility_description">FrameGen creates a trusted non-interactive display layer for generated frames. It does not read screen content or control touch input.</string>
+</resources>

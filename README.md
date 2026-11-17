@@ -7,5 +7,3 @@ The project includes Android MediaProjection capture, a minimal trusted Accessib
 **Important:** the built-in Vulkan engine is original project code. It is not a direct port of Win-FG or WFG/DIS. Those upstream projects were reviewed as future integration candidates; their code is not included in this repository.
 
 Current state: experimental source. The APK and Vulkan path require GitHub Actions/Android SDK build validation and physical testing, especially on Redmi Note 9 Pro / Snapdragon 720G / Adreno 618.
-
-See the build instructions and limitations below.
